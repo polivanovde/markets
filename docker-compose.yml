@@ -1,0 +1,100 @@
+version: '3'
+services:
+
+    #PHP Service
+#    app:
+#        build:
+#            context: .
+#            dockerfile: Dockerfile
+#        image: digitalocean.com/php
+#        container_name: app
+#        restart: unless-stopped
+#        tty: true
+#        environment:
+#            SERVICE_NAME: app
+#            SERVICE_TAGS: dev
+#        volumes:
+#            - ./:/var/www
+#        working_dir: /var/www
+#        networks:
+#            - app-network
+
+    #Nginx Service
+    web:
+        build: ./web
+        environment:
+            - APACHE_RUN_USER=#1000
+        container_name: webserver
+#        restart: unless-stopped
+        tty: true
+        ports:
+            - "2080:80"
+            - "4430:443"
+        volumes:
+            - ${APP_PATH_HOST}:${APP_PATH_CONTAINER}
+#            - ./nginx/conf.d/:/etc/nginx/conf.d/
+            - ${APP_PATH_HOST}:/usr/local/etc/php/conf.d/local.ini
+        working_dir: ${APP_PATH_CONTAINER}
+#        networks:
+#            - app-network
+
+    #MySQL Service
+#    db:
+#        image: mysql:5.7.22
+#        container_name: db
+#        restart: unless-stopped
+#        tty: true
+#        ports:
+#            - "3306:3306"
+#        environment:
+#            MYSQL_DATABASE: laravel
+#            MYSQL_ROOT_PASSWORD: uaQYs4E34q9k
+#            SERVICE_TAGS: dev
+#            SERVICE_NAME: mysql
+#        volumes:
+#            - ${DB_PATH_HOST}:/var/lib/mysql
+#            - ${APP_PATH_HOST}/mysql/my.cnf:/etc/mysql/my.cnf
+#        networks:
+#            - app-network
+
+    db:
+        image: postgres:9.5-alpine
+        container_name: lara-db
+        volumes:
+            - "./sourcefiles/postgres:/var/lib/postgresql/data"
+        environment:
+            - POSTGRES_ROOT_PASSWORD=uaQYs4E34q9k
+            - POSTGRES_DB=postgres
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=uaQYs4E34q9k
+        ports:
+            - "5432:5432"
+
+#    pma:
+#        image: phpmyadmin
+#        container_name: pma
+#        links:
+#            - db
+#        restart: unless-stopped
+#        ports:
+#            - "8080:80"
+#        environment:
+#            PMA_ARBITRARY: 1
+#            PMA_HOST: db
+#            PMA_USER: root
+#            PMA_PASSWORD: uaQYs4E34q9k
+#    composer:
+#        image: composer
+#        volumes:
+#            - ${APP_PATH_HOST}:${APP_PATH_CONTAINER}
+#        working_dir: ${APP_PATH_CONTAINER}
+#        command: composer install
+#Docker Networks
+#networks:
+#    default:
+#        external:
+#            name: user_bridge
+
+#volumes:
+#    dbdata:
+#        driver: local
